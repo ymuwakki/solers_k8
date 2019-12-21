@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~ ^(/.*/service/api/solr/.*)$ {return 403;}
+      location ~ ^(/.*/s/api/solr/.*)$ {return 403;}
+      location ~ ^(/.*/wcservice/api/solr/.*)$ {return 403;}
+      location ~ ^(/.*/wcs/api/solr/.*)$ {return 403;}
+    nginx.ingress.kubernetes.io/proxy-body-size: 5g
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: alf_affinity_route
+  creationTimestamp: "2019-10-26T16:26:10Z"
+  generation: 1
+  name: igor-alfresco-cs-repository
+  namespace: arm-csbs-dev-k8-acs-namespace
+  resourceVersion: "3192134"
+  selfLink: /apis/extensions/v1beta1/namespaces/arm-csbs-dev-k8-acs-namespace/ingresses/igor-alfresco-cs-repository
+  uid: 522c1b89-f80d-11e9-a451-0e63611d085e
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: igor-alfresco-cs-repository
+          servicePort: 80
+        path: /
+      - backend:
+          serviceName: igor-alfresco-cs-repository
+          servicePort: 80
+        path: /api-explorer
+status:
+  loadBalancer:
+    ingress:
+    - hostname: a0c54027ce95911e9a4510e63611d085-1469418408.us-east-1.elb.amazonaws.com

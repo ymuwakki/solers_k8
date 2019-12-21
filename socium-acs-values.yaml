@@ -1,0 +1,134 @@
+# Install ACS
+# This is a YAML-formatted file.  Declare variables to be passed into your templates.
+#      -Dldap.synchronization.groupDifferentialQuery=\\(&\\(objectclass\\=groupOfUniqueNames\\)\\(!\\(modifyTimestamp<\\={0}\\)\\)\\)
+repository:
+  replicaCount: 2
+  image:
+    repository: docker.io/ymuwakki/socium-acs
+    tag: "6.1.0-s6-r5"
+  environment:
+    JAVA_OPTS: " 
+      -Dsolr.base.url=/solr
+      -Dsolr.secureComms=none
+      -Dindex.subsystem.name=solr6
+      -Dalfresco.cluster.enabled=true
+      -Ddeployment.method=HELM_CHART
+      -Dlocal.transform.service.enabled=true
+      -Dtransform.service.enabled=true
+      -Dcsrf.filter.enabled=true
+      -Dcsrf.filter.referer=https?://arm-csbs-dev-kube.armcsbs.org/.+
+      -Dcsrf.filter.referer.always=false
+      -Dcsrf.filter.origin=.+
+      -Dcsrf.filter.origin.always=false
+      -Dcors.enabled=true
+      -Dcors.allowed.origins=*
+      -Dcors.allowed.methods=GET,POST,HEAD,OPTIONS,PUT,DELETE
+      -Dcors.allowed.headers=Authorization,Content-Type,Cache-Control,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,X-CSRF-Token
+      -Dcors.exposed.headers=Access-Control-Allow-Origin,Access-Control-Allow-Credentials
+      -Dauthentication.chain=alfinst:alfrescoNtlm,ldap1:ldap
+      -Dldap.authentication.active=true
+      -Dldap.synchronization.active=true
+      -Dldap.authentication.defaultAdministratorUserNames=Administrator
+      -Dldap.authentication.java.naming.provider.url=ldap://socium-ldap-openldap.arm-csbs-dev-k8-aps-namespace:389
+      -Dldap.synchronization.java.naming.security.principal=cn\\=admin,dc\\=example,dc\\=org
+      -Dldap.synchronization.java.naming.security.credentials=admin
+      -Dldap.synchronization.groupSearchBase=ou\\=groups,dc\\=example,dc\\=org
+      -Dldap.synchronization.userSearchBase=ou\\=users,dc\\=example,dc\\=org
+      -Dldap.synchronization.attributeBatchSize=0
+      -Dldap.synchronization.disabledAccountPropertyValue=true
+      -Dldap.synchronization.disabledAccountPropertyValueCanBeNull=true
+      -Dldap.synchronization.enableProgressEstimation=true
+      -Dldap.synchronization.groupDisplayNameAttributeName=description
+      -Dldap.synchronization.groupIdAttributeName=cn
+      -Dldap.synchronization.groupMemberAttributeName=member
+      -Dldap.synchronization.groupQuery=\\(objectclass\\=groupOfNames\\)
+      -Dldap.synchronization.groupType=groupOfNames
+      -Dldap.synchronization.java.naming.security.authentication=simple
+      -Dldap.synchronization.modifyTimestampAttributeName=modifyTimestamp
+      -Dldap.synchronization.personQuery=\\(objectclass\\=inetOrgPerson\\)
+      -Dldap.synchronization.personType=inetOrgPerson
+      -Dldap.synchronization.queryBatchSize=0
+      -Dldap.synchronization.userAccountStatusInterpreter=ldapUserAccountStatusInterpreter
+      -Dldap.synchronization.userAccountStatusProperty=nsAccountLock
+      -Dldap.synchronization.userEmailAttributeName=mail
+      -Dldap.synchronization.userFirstNameAttributeName=givenName
+      -Dldap.synchronization.userIdAttributeName=cn
+      -Dldap.synchronization.userLastNameAttributeName=sn
+      -Dldap.synchronization.userOrganizationalIdAttributeName=o
+      -Xms2000M -Xmx2000M"
+
+persistence:
+  repository:
+    enabled: false
+  solr:
+    data:
+      subPath: "arm-csbs-dev-k8-acs-namespace/alfresco-content-services/solr-data"
+
+alfresco-content-services:
+  alfresco-infrastructure:
+    enabled: true
+
+alfresco-infrastructure:
+  activemq:
+    enabled: true
+  alfresco-identity-service:
+    enabled: false
+  persistence:
+    efs:
+      enabled: true
+      dns: fs-44af62c5.efs.us-east-1.amazonaws.com
+
+externalProtocol: https
+externalHost: arm-csbs-dev-kube.armcsbs.org
+externalPort: 443
+
+alfresco-search:
+  enabled: true
+  resources:
+    requests:
+      memory: "2500Mi"
+    limits:
+      memory: "2500Mi"
+  ingress:
+    enabled: true
+    basicAuth: "YWRtaW46JGFwcjEkVVJqb29uS00kSEMuS1EwVkRScFpwSHB2a3JwTDd1Lg==" 
+    whitelist_ips: "0.0.0.0/0" 
+
+alfresco-digital-workspace:
+  enabled: true
+  ingress:
+    path: /workspace
+
+networkpolicysetting:
+  enabled: false
+
+database:
+  external: true
+  driver: org.postgresql.Driver
+  user: alfresco
+  password: alfresco
+  url: "jdbc:postgresql://socium-rds.cyim9cs0bc6z.us-east-1.rds.amazonaws.com:5432/alfresco?useSSL=false"
+
+postgresql:
+  enabled: false
+
+s3connector:
+  enabled: true
+  config:
+    bucketName: arm-socium-acs
+    bucketLocation: us-east-1
+  secrets:
+    encryption: aes256
+
+activemq:
+  enabled: true
+
+#messageBroker:
+#  url: "ssl://b-7c242be6-bb8d-4ee0-8d28-73d6b63698ed-1.mq.us-east-1.amazonaws.com:61617"
+#  user: alfresco
+#  password: "Pizza3.14159"
+
+share:
+  environment:
+    CSRFFILTERREFERER: "https?://arm-csbs-dev-kube.armcsbs.org/.+"
+    CSRFFILTERORIGIN: ".+"

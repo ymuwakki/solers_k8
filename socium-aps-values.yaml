@@ -1,0 +1,105 @@
+# Socium values for Alfresco Process Services.
+# This is a YAML-formatted file.
+registryPullSecrets: quay-registry-secret
+
+processEngine:
+  image:
+    repository: docker.io/ymuwakki/socium-aps
+    tag: "1.9.0.5-s6-r3"
+  environment:
+    HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    DATASOURCE_DRIVER: "org.postgresql.Driver"
+    DATASOURCE_URL: "jdbc:postgresql://socium-aps.cyim9cs0bc6z.us-east-1.rds.amazonaws.com:5432/activiti?characterEncoding=UTF-8"
+    DATASOURCE_USERNAME: "alfresco"
+    ACTIVITI_ES_CLUSTER_NAME: "elasticsearch"
+    ACTIVITI_ES_DISCOVERY_TYPE: "unicast"
+    ACTIVITI_ES_DISCOVERY_HOSTS: "localhost:9300"
+    ELASTIC_SEARCH_ENABLE_HTTP: "true"
+    ELASTIC_SEARCH_SERVER_TYPE: "rest"
+    ELASTIC_SEARCH_REST_CLIENT_PORT: "80"
+    ELASTIC_SEARCH_REST_CLIENT_ADDRESS: "vpc-socium-2qkg33mzntv5rpackrrubbk2h4.us-east-1.es.amazonaws.com"
+    ELASTIC_SEARCH_REST_CLIENT_CONNECT_TIMEOUT: "10000"
+    ELASTIC_SEARCH_REST_CLIENT_SOCKET_TIMEOUT: "10000"
+    ACTIVITI_VALIDATOR_EDITOR_BPMN_DISABLE_SCRIPTTASK: "false"
+    ACTIVITI_VALIDATOR_EDITOR_BPMN_DISABLE_SCRIPTTASK_GROOVY: "false"
+#    CONTENTSTORAGE_S3_BUCKETNAME: "arm-socium-aps"
+#    CONTENTSTORAGE_FS_ROOTFOLDER: ""
+    LDAP_AUTHENTICATION_ENABLED: "true"
+    LDAP_AUTHENTICATION_JAVA_NAMING_PROVIDER_URL: "ldap://socium-ldap-openldap:389"
+    LDAP_SYNCHRONIZATION_JAVA_NAMING_SECURITY_PRINCIPAL: "cn=admin,dc=example,dc=org"
+    LDAP_SYNCHRONIZATION_JAVA_NAMING_SECURITY_CREDENTIALS: "admin"
+    LDAP_SYNCHRONIZATION_FULL_ENABLED: "true"
+    LDAP_SYNCHRONIZATION_DIFFERENTIAL_ENABLED: "true"
+# Every minute diff synch
+    LDAP_SYNCHRONIZATION_DIFFERENTIAL_CRONEXPRESSION: "0 */1 * * * ?"
+    LDAP_SYNCHRONIZATION_USERSEARCHBASE: "ou=users,dc=example,dc=org"
+    LDAP_SYNCHRONIZATION_GROUPSEARCHBASE: "ou=groups,dc=example,dc=org"
+    LDAP_SYNCHRONIZATION_GROUPQUERY: "(objectclass=groupOfNames)"
+    LDAP_SYNCHRONIZATION_GROUPTYPE: "groupOfNames"
+    LDAP_SYNCHRONIZATION_GROUPMEMBERATTRIBUTENAME: "member"
+    SOCIUM_ALFRESCO_ACS_ENDPOINT: "https://arm-csbs-dev-kube.armcsbs.org/alfresco/"
+    CORS_ENABLED: "true"
+    CORS_ALLOWED_ORIGINS: "*"
+    CORS_ALLOWED_METHODS:  "GET,POST,HEAD,OPTIONS,PUT,DELETE"
+    CORS_ALLOWED_HEADERS: "Authorization,Content-Type,Cache-Control,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,X-CSRF-Token"
+    CORS_EXPOSED_HEADERS: "Access-Control-Allow-Origin,Access-Control-Allow-Credentials"
+
+license:
+  secretName: licenseaps
+
+persistence:
+  reclaimPolicy: "Retain"
+  existingClaim: "alfresco-volume-claim"
+  mountPath: "/usr/local/data"
+  subPath: "alfresco-process-services/process-data"
+
+alfresco-process-services:
+  alfresco-infrastructure:
+    enabled: true
+  postgresql:
+    enabled: false
+    
+adminApp:
+  image:
+    repository: "docker.io/ymuwakki/solers-aps-admin"
+    tag: "1.9.0.5-s6"
+  environment:
+    DATASOURCE_URL: "jdbc:postgresql://socium-aps.cyim9cs0bc6z.us-east-1.rds.amazonaws.com:5432/activitiadmin?characterEncoding=UTF-8"
+    DATASOURCE_USERNAME: "alfresco"
+    DATASOURCE_DRIVER: "org.postgresql.Driver"
+    HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+    ACTIVITI_ADMIN_REST_APP_HOST: "http://localhost"
+    ACTIVITI_ADMIN_REST_APP_PORT: "80"
+    ACTIVITI_ADMIN_REST_APP_USERNAME: "admin@app.activiti.com"
+    ACTIVITI_ADMIN_REST_APP_PASSWORD: "admin"
+
+processWorkspace:
+  image:
+    repository: quay.io/alfresco/alfresco-process-workspace-app
+    tag: "1.3.2"
+  environment:
+    APP_CONFIG_BPM_HOST: "https://solers-aps.armcsbs.org"
+#    APP_CONFIG_BPM_HOST: '{{ tpl (.Values.ingress.hostName | default "http://localhost") . }}'
+
+postgresql:
+  enabled: false
+
+alfresco-infrastructure:
+  persistence:
+    efs:
+      enabled: true
+      dns: fs-44af62c5.efs.us-east-1.amazonaws.com
+    reclaimPolicy: "Retain"
+  nginx-ingress:
+    enabled: false
+  rabbitmq-ha:
+    enabled: false
+  activemq:
+    enabled: false
+  alfresco-activiti-cloud-registry:
+    enabled: false
+  alfresco-api-gateway:
+    enabled: false
+  alfresco-identity-service:
+    enabled: false
+

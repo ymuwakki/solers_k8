@@ -1,0 +1,16 @@
+kops create cluster \
+  --ssh-public-key ~/armcsbs.pem \
+  --name $KOPS_NAME \
+  --state $KOPS_STATE_STORE \
+  --node-count 2 \
+  --zones us-east-1a \
+  --master-zones us-east-1a \
+  --cloud aws \
+  --node-size m5.xlarge \
+  --master-size t2.medium \
+  -v 10 \
+  --kubernetes-version "1.14.6" \
+  --bastion \
+  --topology private \
+  --networking weave \
+  --yes

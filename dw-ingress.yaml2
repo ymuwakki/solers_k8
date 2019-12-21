@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 5g
+  creationTimestamp: "2019-10-26T16:26:10Z"
+  generation: 1
+  labels:
+    component: digitalWorkspaceApplication
+  name: igor-alfresco-dw
+  namespace: arm-csbs-dev-k8-acs-namespace
+  resourceVersion: "6412942"
+  selfLink: /apis/extensions/v1beta1/namespaces/arm-csbs-dev-k8-acs-namespace/ingresses/igor-alfresco-dw
+  uid: 522378b0-f80d-11e9-a451-0e63611d085e
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: igor-alfresco-dw
+          servicePort: 80
+        path: /digital-workspace
+status:
+  loadBalancer:
+    ingress:
+    - hostname: a0c54027ce95911e9a4510e63611d085-1469418408.us-east-1.elb.amazonaws.com

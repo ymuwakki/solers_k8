@@ -1,0 +1,11 @@
+#
+helm install alfresco-incubator/alfresco-process-services --namespace=$APS_DESIREDNAMESPACE \
+--version 0.1.5 \
+--name igoraps \
+--set alfresco-infrastructure.persistence.efs.dns="$EFS_SERVER" \
+--set activiti.image.repository="ymuwakki/solers-aps" \
+--set activiti.image.tag="1.9.0.5" \
+--set admin.image.repository="ymuwakki/solers-aps-admin" \
+--set admin.image.tag="1.9.0.5" \
+--set alfresco-infrastructure.nginx-ingress.enabled=false \
+--set license.secretName=licenseaps 

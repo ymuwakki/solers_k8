@@ -1,0 +1,40 @@
+# Install ACS
+helm upgrade socium-acs --install alfresco-stable/alfresco-content-services \
+--namespace=$KACS \
+--version 2.0.0 \
+--set networkpolicysetting.enabled=false \
+--set repository.replicaCount=1 \
+--set repository.image.repository="docker.io/ymuwakki/socium-acs" \
+--set repository.image.tag="6.1.0" \
+--set share.image.repository="300674751221.dkr.ecr.us-east-1.amazonaws.com/share" \
+--set share.image.tag="k8" \
+--set alfresco-digital-workspace.ingress.path="/workspace" \
+--set externalProtocol="https" \
+--set externalHost="$EXTERNALHOST" \
+--set externalPort="443" \
+--set repository.adminPassword="$ALF_ADMIN_PWD" \
+--set alfresco-infrastructure.persistence.efs.enabled=true \
+--set alfresco-infrastructure.persistence.efs.dns="$EFS_SERVER" \
+--set alfresco-search.resources.requests.memory="2500Mi",alfresco-search.resources.limits.memory="2500Mi" \
+--set alfresco-search.environment.SOLR_JAVA_MEM="-Xms2000M -Xmx2000M" \
+--set alfresco-search.ingress.enabled=true \
+--set alfresco-search.ingress.basicAuth="YWRtaW46JGFwcjEkVVJqb29uS00kSEMuS1EwVkRScFpwSHB2a3JwTDd1Lg==" \
+--set alfresco-search.ingress.whitelist_ips="0.0.0.0/0" \
+--set persistence.solr.data.subPath="$KACS/alfresco-content-services/solr-data" \
+--set persistence.repository.enabled=false \
+--set postgresql.enabled=false \
+--set database.external=true \
+--set database.driver="org.postgresql.Driver" \
+--set database.user="alfresco" \
+--set database.password="alfresco" \
+--set database.url="jdbc:postgresql://socium-rds.cyim9cs0bc6z.us-east-1.rds.amazonaws.com:5432/alfresco?useSSL=false" \
+--set s3connector.enabled=true \
+--set s3connector.config.bucketName=arm-socium-acs \
+--set s3connector.config.bucketLocation=us-east-1 \
+--set s3connector.secrets.encryption=aes256 \
+--set activemq.enabled=false \
+--set messageBroker.url="$MESSAGE_BROKER_URL" \
+--set messageBroker.user="$MESSAGE_BROKER_USER" \
+--set messageBroker.password="$MESSAGE_BROKER_PASSWORD" \
+--set alfresco-digital-workspace.ingress.annotations."nginx\.ingress\.kubernetes\.io/rewrite-target"="/workspace" \
+--set registryPullSecrets=quay-registry-secret
